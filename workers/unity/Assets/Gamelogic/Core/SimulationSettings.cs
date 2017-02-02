@@ -93,7 +93,7 @@ namespace Assets.Gamelogic.Core
         public static int MaxSpellTargets = 64;
         public static float SpellEffectDuration = 2f;
         public static float DeathEffectDuration = 1f;
-        public static float SpellCooldown = 10f;
+        public static float SpellCooldown = 2f;
         public static float RainCloudSpawnHeight = 7f;
         public static float PlayerCastAnimationTime = 0.7f;
         public static float PlayerCastAnimationBuffer = 0.5f;

@@ -1,5 +1,6 @@
 using System.Collections;
 using Assets.Gamelogic.Abilities;
+using Assets.Gamelogic.Communication;
 using Assets.Gamelogic.Core;
 using Assets.Gamelogic.UI;
 using Improbable.Abilities;
@@ -146,9 +147,28 @@ namespace Assets.Gamelogic.Player
 
         private void UpdateChatControls()
         {
-            //Todo: Handle enabling and disabling ChatMode here!
-            if (Input.GetKeyDown(KeyCode.UpArrow) && ChatPanelController.ChatModeActive) ChatPanelController.ReuseLastMessage();
-            if (Input.GetKeyDown(SimulationSettings.AbortKey) && ChatPanelController.ChatModeActive) DeactivateChat();
+            if (ChatPanelController.ChatModeActive)
+            {
+                if (Input.GetKeyDown(SimulationSettings.SubmitChatKey))
+                {
+                    var message = ChatPanelController.SubmitChat();
+                    if (message.Length > 0)
+                    {
+                        var chatBehaviour = GetComponent<SendChatBehaviour>();
+                        chatBehaviour.SayChat(message);
+                    }
+                }
+
+                if (Input.GetKeyDown(KeyCode.UpArrow)) ChatPanelController.ReuseLastMessage();
+                if (Input.GetKeyDown(SimulationSettings.AbortKey)) DeactivateChat();
+            }
+            else
+            {
+                if (Input.GetKeyDown(SimulationSettings.SubmitChatKey))
+                {
+                    ActivateChat();
+                }
+            }
         }
     }
 }
