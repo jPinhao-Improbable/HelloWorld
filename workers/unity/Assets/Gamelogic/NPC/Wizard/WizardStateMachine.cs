@@ -5,6 +5,7 @@ using Improbable;
 using Improbable.Math;
 using Improbable.Npc;
 using System.Collections.Generic;
+using Assets.Gamelogic.NPC.Wizard.StateFactories;
 using Assets.Gamelogic.Utils;
 using UnityEngine;
 
@@ -26,7 +27,7 @@ namespace Assets.Gamelogic.NPC.Wizard
             npcWizard = inNpcWizard;
 
             var idleState = new WizardIdleState(this, teamAssignment, cachedTeamHqCoordinates);
-            var moveToTargetState = new WizardMoveToTargetState(this, behaviour, targetNavigation, navigation);
+            var moveToTargetState = WizardMoveToTargetStateFactory.Build(this, behaviour, targetNavigation, navigation);
             var attackingState = new WizardAttackingState(this, behaviour, spellsBehaviour);
             var defendingState = new WizardDefendingState(this, behaviour, spellsBehaviour);
             var onFireState = new WizardOnFireState(this, navigation, targetNavigation);

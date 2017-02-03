@@ -1,5 +1,6 @@
 using Assets.Gamelogic.Core;
 using Assets.Gamelogic.FSM;
+using Assets.Gamelogic.NPC.Wizard.InteractionStrategies;
 using Assets.Gamelogic.Utils;
 using Improbable;
 using Improbable.Npc;
@@ -13,17 +14,21 @@ namespace Assets.Gamelogic.NPC.Wizard
         private readonly TargetNavigation.Writer targetNavigation;
         private readonly TargetNavigationBehaviour navigation;
 
+        private readonly IStateChangerStrategy interactStrategy;
+
         private Coroutine checkForNearbyEnemiesOrAlliesCoroutine;
 
         public WizardMoveToTargetState(WizardStateMachine owner,
                                        WizardBehaviour inParentBehaviour,
                                        TargetNavigation.Writer inTargetNavigation,
-                                       TargetNavigationBehaviour inNavigation)
+                                       TargetNavigationBehaviour inNavigation,
+                                       IStateChangerStrategy interactionStrategy)
             : base(owner)
         {
             parentBehaviour = inParentBehaviour;
             targetNavigation = inTargetNavigation;
             navigation = inNavigation;
+            interactStrategy = interactionStrategy;
         }
 
         public override void Enter()
@@ -67,17 +72,18 @@ namespace Assets.Gamelogic.NPC.Wizard
         private void StartMovingTowardsTargetEntity()
         {
             var targetGameObject = NPCUtils.GetTargetGameObject(Owner.Data.targetEntityId);
-            if (targetGameObject == null)
+
+            var newState = interactStrategy.TryInteract(targetGameObject);
+            if (newState == WizardFSMState.StateEnum.MOVING_TO_TARGET)
             {
-                Owner.TriggerTransition(WizardFSMState.StateEnum.IDLE, EntityId.InvalidEntityId, SimulationSettings.InvalidPosition);
-                return;
+                //if strategy says we need to keep chasing our target
+                navigation.StartNavigation(Owner.Data.targetEntityId, SimulationSettings.NPCWizardSpellCastingSqrDistance);
             }
-            if (NPCUtils.IsWithinInteractionRange(parentBehaviour.transform.position, targetGameObject.transform.position, SimulationSettings.NPCWizardSpellCastingSqrDistance))
+            else
             {
-                AttemptInteractionWithTarget();
-                return;
+                //Owner.TriggerTransition(WizardFSMState.StateEnum.IDLE, EntityId.InvalidEntityId, SimulationSettings.InvalidPosition);
+                Owner.TriggerTransition(newState, Owner.Data.targetEntityId, SimulationSettings.InvalidPosition);
             }
-            navigation.StartNavigation(Owner.Data.targetEntityId, SimulationSettings.NPCWizardSpellCastingSqrDistance);
         }
 
         private void StartMovingTowardsTargetPosition()
@@ -93,7 +99,7 @@ namespace Assets.Gamelogic.NPC.Wizard
 
         private void CheckForNearbyEnemiesOrAllies()
         {
-            var nearestTarget = FindNearestTargetToAttackOrDefend();
+            var nearestTarget = interactStrategy.FindEntity();
             if (EntityId.IsValidEntityId(nearestTarget))
             {
                 if (!TargetIsEntity() || nearestTarget != Owner.Data.targetEntityId)
@@ -103,31 +109,10 @@ namespace Assets.Gamelogic.NPC.Wizard
             }
         }
 
-        private EntityId FindNearestTargetToAttackOrDefend()
-        {
-            var layerMask = ~(1 << LayerMask.NameToLayer(SimulationSettings.TreeLayerName));
-            var nearestDefendableTarget = NPCUtils.FindNearestTarget(parentBehaviour.gameObject, SimulationSettings.NPCViewRadius, NPCUtils.IsTargetDefendable, layerMask);
-            var nearestAttackableTarget = NPCUtils.FindNearestTarget(parentBehaviour.gameObject, SimulationSettings.NPCViewRadius, NPCUtils.IsTargetAttackable, layerMask);
-
-            if (nearestDefendableTarget == null && nearestAttackableTarget == null)
-            {
-                return EntityId.InvalidEntityId;
-            }
-
-            var sqrDistanceToNearestDefendableTarget = (nearestDefendableTarget != null) ? MathUtils.SqrDistance(parentBehaviour.transform.position, nearestDefendableTarget.transform.position) : float.MaxValue;
-            var sqrDistanceToNearestAttackableTarget = (nearestAttackableTarget != null) ? MathUtils.SqrDistance(parentBehaviour.transform.position, nearestAttackableTarget.transform.position) : float.MaxValue;
-
-            return (sqrDistanceToNearestDefendableTarget < sqrDistanceToNearestAttackableTarget) ? nearestDefendableTarget.gameObject.EntityId() : nearestAttackableTarget.gameObject.EntityId();
-        }
-
         private void AttemptInteractionWithTarget()
         {
             var targetGameObject = NPCUtils.GetTargetGameObject(Owner.Data.targetEntityId);
-            if (targetGameObject == null)
-            {
-                Owner.TriggerTransition(WizardFSMState.StateEnum.IDLE, EntityId.InvalidEntityId, SimulationSettings.InvalidPosition);
-                return;
-            }
+
             if (NPCUtils.IsTargetAttackable(parentBehaviour.gameObject, targetGameObject) &&
                 NPCUtils.IsWithinInteractionRange(parentBehaviour.transform.position, targetGameObject.transform.position, SimulationSettings.NPCWizardSpellCastingSqrDistance))
             {
@@ -149,7 +134,7 @@ namespace Assets.Gamelogic.NPC.Wizard
             {
                 if (TargetIsEntity())
                 {
-                    AttemptInteractionWithTarget();
+                    StartMovingTowardsTargetEntity();
                 }
                 else
                 {
