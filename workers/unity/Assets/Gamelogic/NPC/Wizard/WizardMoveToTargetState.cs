@@ -108,25 +108,6 @@ namespace Assets.Gamelogic.NPC.Wizard
                 }
             }
         }
-
-        private void AttemptInteractionWithTarget()
-        {
-            var targetGameObject = NPCUtils.GetTargetGameObject(Owner.Data.targetEntityId);
-
-            if (NPCUtils.IsTargetAttackable(parentBehaviour.gameObject, targetGameObject) &&
-                NPCUtils.IsWithinInteractionRange(parentBehaviour.transform.position, targetGameObject.transform.position, SimulationSettings.NPCWizardSpellCastingSqrDistance))
-            {
-                Owner.TriggerTransition(WizardFSMState.StateEnum.ATTACKING_TARGET, Owner.Data.targetEntityId, SimulationSettings.InvalidPosition);
-                return;
-            }
-            if (NPCUtils.IsTargetDefendable(parentBehaviour.gameObject, targetGameObject) &&
-                NPCUtils.IsWithinInteractionRange(parentBehaviour.transform.position, targetGameObject.transform.position, SimulationSettings.NPCWizardSpellCastingSqrDistance))
-            {
-                Owner.TriggerTransition(WizardFSMState.StateEnum.DEFENDING_TARGET, Owner.Data.targetEntityId, SimulationSettings.InvalidPosition);
-                return;
-            }
-            Owner.TriggerTransition(WizardFSMState.StateEnum.IDLE, EntityId.InvalidEntityId, SimulationSettings.InvalidPosition);
-        }
         
         private void OnTargetNavigationUpdated(TargetNavigation.Update update)
         {
