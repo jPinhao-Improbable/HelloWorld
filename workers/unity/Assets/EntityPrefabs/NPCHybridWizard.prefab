@@ -438,7 +438,7 @@ GameObject:
   - component: {fileID: 114435504300975858}
   - component: {fileID: 114681089817436676}
   m_Layer: 0
-  m_Name: NPCWizard
+  m_Name: NPCHybridWizard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1612,6 +1612,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RedMaterial: {fileID: 2100000, guid: 395985a9edc3e1849a2961a7590ad7f5, type: 2}
   BlueMaterial: {fileID: 2100000, guid: 5c59295ac8a68f74d9589afd204e55e3, type: 2}
+  RoleHue: {fileID: 2100000, guid: 771d7be986ecff94ea986dec79f33d4e, type: 2}
   ModelRenderers:
   - {fileID: 137000014050372180}
 --- !u!114 &114000013393478452

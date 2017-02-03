@@ -106,8 +106,8 @@ namespace Assets.Gamelogic.Building
 
         private void SpawnWizard(Coordinates position)
         {
-            var template = EntityTemplateFactory.CreateNPCWizardTemplate(position, teamAssignment.Data.teamId);
-            SpatialOS.Commands.CreateEntity(npcSpawner, SimulationSettings.NPCWizardPrefabName, template, result => { });
+            var template = NPCWizardTemplateFactory.CreateNPCWizardTemplate(position, teamAssignment.Data.teamId);
+            SpatialOS.Commands.CreateEntity(npcSpawner, template.Prefab, template, result => { });
         }
 
         public void ResetCooldowns()

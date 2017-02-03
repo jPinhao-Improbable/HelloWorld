@@ -93,7 +93,7 @@ namespace Assets.Editor
                 }
                 else
                 {
-                    entity = EntityTemplateFactory.CreateNPCWizardTemplate(coordinates, team);
+                    entity = NPCWizardTemplateFactory.CreateNPCWizardTemplate(coordinates, team);
                 }
 
                 var id = snapshot.GenerateId();

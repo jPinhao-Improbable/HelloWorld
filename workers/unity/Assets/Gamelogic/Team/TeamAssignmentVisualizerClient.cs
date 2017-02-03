@@ -15,6 +15,7 @@ namespace Assets.Gamelogic.Team
 
         [SerializeField] private Material RedMaterial;
         [SerializeField] private Material BlueMaterial;
+        [SerializeField] private Material RoleHue;
         [SerializeField] private Renderer[] ModelRenderers;
 
         private void OnEnable()
@@ -46,6 +47,7 @@ namespace Assets.Gamelogic.Team
                     break;
             }
 
+            newMaterial.Lerp(newMaterial, RoleHue, 0.25f);
             for (int rendererNum = 0; rendererNum < ModelRenderers.Length; rendererNum++)
             {
                 Material[] newMats = ModelRenderers[rendererNum].sharedMaterials;
