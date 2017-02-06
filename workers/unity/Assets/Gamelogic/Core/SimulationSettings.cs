@@ -123,7 +123,7 @@ namespace Assets.Gamelogic.Core
         public static int LumberjackMaxHealth = 5;
         public static int WizardMaxHealth = 5;
         public static int NPCSpawningWorldEdgeLength = Mathf.CeilToInt(4 * (float)SpawningWorldEdgeLength / 5);
-        public static float NPCMovementSpeed = 20f;
+        public static float NPCMovementSpeed = 10f;
         public static float NPCInteractionDelay = 0.2f;
         public static float NPCChoppingAnimationStartDelay = 0.2f;
         public static float NPCChoppingAnimationFinishDelay = 2f;
