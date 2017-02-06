@@ -2,16 +2,18 @@
 using Assets.Gamelogic.NPC.Wizard.EntityFinders;
 using Improbable;
 using Improbable.Npc;
+using Improbable.Unity;
+using Improbable.Unity.Visualizer;
 using UnityEngine;
 
 namespace Assets.Gamelogic.NPC.Wizard.InteractionStrategies
 {
+    [EngineType(EnginePlatform.FSim)]
     public class DefendFriendBehaviour : MonoBehaviour, IInteractionStrategy
     {
         public IEntityFinder EntityFinder { get; private set; }
 
         public TargetNavigationBehaviour navigation;
-        //[SerializeField] private TargetNavigationBehaviour navigation;
 
         public void Awake()
         {
