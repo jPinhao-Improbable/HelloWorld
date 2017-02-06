@@ -1686,6 +1686,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9766d94a256fc094b83457da577a4e57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  navigation: {fileID: 114000012395693278}
 --- !u!114 &114681089817436676
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1697,6 +1698,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00ebf5fdbbc47e846ad9d8b83db264b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  navigation: {fileID: 114000012395693278}
 --- !u!136 &136000012983362050
 CapsuleCollider:
   m_ObjectHideFlags: 1

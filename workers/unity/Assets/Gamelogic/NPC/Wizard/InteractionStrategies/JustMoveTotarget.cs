@@ -8,13 +8,8 @@ using UnityEngine;
 
 namespace Assets.Gamelogic.NPC.Wizard.InteractionStrategies
 {
-    public class DoNothing : IStateChangerStrategy
+    public class JustMoveTotarget : IInteractionStrategy
     {
-        public EntityId FindEntity()
-        {
-            return EntityId.InvalidEntityId;
-        }
-
         public WizardFSMState.StateEnum TryInteract(GameObject target)
         {
             return WizardFSMState.StateEnum.MOVING_TO_TARGET;

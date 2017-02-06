@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Assets.Gamelogic.NPC.Wizard.InteractionStrategies
 {
-    public interface IInteraction
+    public interface IInteractionStrategy
     {
         WizardFSMState.StateEnum TryInteract(GameObject target);
     }

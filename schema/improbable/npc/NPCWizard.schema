@@ -4,9 +4,10 @@ type WizardFSMState {
   enum StateEnum {
     IDLE = 0;
     MOVING_TO_TARGET = 1;
-    ATTACKING_TARGET = 2;
-    DEFENDING_TARGET = 3;
-    ON_FIRE = 4;
+	MOVING_TO_POSITION = 2;
+    ATTACKING_TARGET = 3;
+    DEFENDING_TARGET = 4;
+    ON_FIRE = 5;
   }  
 }
 

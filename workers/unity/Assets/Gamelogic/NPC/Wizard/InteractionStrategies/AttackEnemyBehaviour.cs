@@ -1,18 +1,21 @@
 ﻿using Assets.Gamelogic.Core;
+using Assets.Gamelogic.NPC.Wizard.EntityFinders;
 using Improbable;
 using Improbable.Npc;
 using UnityEngine;
 
 namespace Assets.Gamelogic.NPC.Wizard.InteractionStrategies
 {
-    public class AttackEnemyBehaviour : MonoBehaviour, IStateChangerStrategy
+    public class AttackEnemyBehaviour : MonoBehaviour, IInteractionStrategy
     {
-        public EntityId FindEntity()
-        {
-            var layerMask = ~(1 << LayerMask.NameToLayer(SimulationSettings.TreeLayerName));
-            var nearestAttackableTarget = NPCUtils.FindNearestTarget(this.gameObject, SimulationSettings.NPCViewRadius, NPCUtils.IsTargetAttackable, layerMask);
+        public IEntityFinder EntityFinder { get; private set; }
 
-            return nearestAttackableTarget == null ? EntityId.InvalidEntityId : nearestAttackableTarget.EntityId();
+        public TargetNavigationBehaviour navigation;
+        //[SerializeField] private TargetNavigationBehaviour navigation;
+
+        public void Awake()
+        {
+            EntityFinder = new AttackableEnemyFinder(gameObject);
         }
 
         public WizardFSMState.StateEnum TryInteract(GameObject target)
@@ -25,6 +28,7 @@ namespace Assets.Gamelogic.NPC.Wizard.InteractionStrategies
             if (!NPCUtils.IsWithinInteractionRange(transform.position, target.transform.position, SimulationSettings.NPCWizardSpellCastingSqrDistance))
             {
                 //target too far, keep moving to target
+                navigation.StartNavigation(target.EntityId(), SimulationSettings.NPCWizardSpellCastingSqrDistance);
                 return WizardFSMState.StateEnum.MOVING_TO_TARGET;
             }
 

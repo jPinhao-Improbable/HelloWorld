@@ -4,6 +4,12 @@ namespace Assets.Gamelogic.NPC.Wizard.InteractionStrategies
 {
     public interface IEntityFinder
     {
-        EntityId FindEntity();
+        FoundEntity FindEntity();
+    }
+
+    public struct FoundEntity
+    {
+        public EntityId entity;
+        public float distance;
     }
 }

@@ -14,27 +14,28 @@ namespace Assets.Gamelogic.NPC.Wizard
         private readonly TargetNavigation.Writer targetNavigation;
         private readonly TargetNavigationBehaviour navigation;
 
-        private readonly IStateChangerStrategy interactStrategy;
+        private readonly IEntityFinder targetFinder;
+        private readonly IInteractionStrategy interactStrategy;
 
-        private Coroutine checkForNearbyEnemiesOrAlliesCoroutine;
+        private Coroutine checkForNewTargetCoroutine;
 
         public WizardMoveToTargetState(WizardStateMachine owner,
                                        WizardBehaviour inParentBehaviour,
                                        TargetNavigation.Writer inTargetNavigation,
-                                       TargetNavigationBehaviour inNavigation,
-                                       IStateChangerStrategy interactionStrategy)
+                                       IEntityFinder newTargetFinder,
+                                       IInteractionStrategy interactionStrategy)
             : base(owner)
         {
             parentBehaviour = inParentBehaviour;
             targetNavigation = inTargetNavigation;
-            navigation = inNavigation;
+            targetFinder = newTargetFinder;
             interactStrategy = interactionStrategy;
         }
 
         public override void Enter()
         {
             targetNavigation.ComponentUpdated += OnTargetNavigationUpdated;
-            checkForNearbyEnemiesOrAlliesCoroutine = parentBehaviour.StartCoroutine(TimerUtils.CallRepeatedly(SimulationSettings.NPCPerceptionRefreshInterval, CheckForNearbyEnemiesOrAllies));
+            checkForNewTargetCoroutine = parentBehaviour.StartCoroutine(TimerUtils.CallRepeatedly(SimulationSettings.NPCPerceptionRefreshInterval, CheckForNewTarget));
             StartMovingTowardsTarget();
         }
 
@@ -45,67 +46,46 @@ namespace Assets.Gamelogic.NPC.Wizard
         public override void Exit(bool disabled)
         {
             targetNavigation.ComponentUpdated -= OnTargetNavigationUpdated;
-            StopCheckForNearbyEnemiesOrAlliesCoroutine();
+            StopCheckForNewTarget();
         }
 
-        private void StopCheckForNearbyEnemiesOrAlliesCoroutine()
+        private void StopCheckForNewTarget()
         {
-            if (checkForNearbyEnemiesOrAlliesCoroutine != null)
+            if (checkForNewTargetCoroutine != null)
             {
-                parentBehaviour.StopCoroutine(checkForNearbyEnemiesOrAlliesCoroutine);
-                checkForNearbyEnemiesOrAlliesCoroutine = null;
+                parentBehaviour.StopCoroutine(checkForNewTargetCoroutine);
+                checkForNewTargetCoroutine = null;
             }
         }
 
         private void StartMovingTowardsTarget()
         {
-            if (TargetIsEntity())
-            {
-                StartMovingTowardsTargetEntity();
-            }
-            else
-            {
-                StartMovingTowardsTargetPosition();
-            }
-        }
-
-        private void StartMovingTowardsTargetEntity()
-        {
             var targetGameObject = NPCUtils.GetTargetGameObject(Owner.Data.targetEntityId);
-
+            
             var newState = interactStrategy.TryInteract(targetGameObject);
-            if (newState == WizardFSMState.StateEnum.MOVING_TO_TARGET)
+            if (newState != WizardFSMState.StateEnum.MOVING_TO_TARGET)
             {
-                //if strategy says we need to keep chasing our target
-                navigation.StartNavigation(Owner.Data.targetEntityId, SimulationSettings.NPCWizardSpellCastingSqrDistance);
-            }
-            else
-            {
-                //Owner.TriggerTransition(WizardFSMState.StateEnum.IDLE, EntityId.InvalidEntityId, SimulationSettings.InvalidPosition);
+                //TODO: will IDLE do funny things if targetEntityId != invalid?
                 Owner.TriggerTransition(newState, Owner.Data.targetEntityId, SimulationSettings.InvalidPosition);
             }
         }
 
-        private void StartMovingTowardsTargetPosition()
+        private void CheckForNewTarget()
         {
-            var targetPosition = Owner.Data.targetPosition.ToVector3();
-            if (MathUtils.CompareEqualityEpsilon(targetPosition, SimulationSettings.InvalidPosition))
+            var nearestTarget = targetFinder.FindEntity();
+            if (EntityId.IsValidEntityId(nearestTarget.entity))
             {
-                Owner.TriggerTransition(WizardFSMState.StateEnum.IDLE, EntityId.InvalidEntityId, SimulationSettings.InvalidPosition);
-                return;
-            }
-            navigation.StartNavigation(targetPosition, SimulationSettings.NPCDefaultInteractionSqrDistance);
-        }
-
-        private void CheckForNearbyEnemiesOrAllies()
-        {
-            var nearestTarget = interactStrategy.FindEntity();
-            if (EntityId.IsValidEntityId(nearestTarget))
-            {
-                if (!TargetIsEntity() || nearestTarget != Owner.Data.targetEntityId)
+                //check we have a valid entity within range, and it's not the same one we're already targetting
+                if (nearestTarget.entity != Owner.Data.targetEntityId)
                 {
-                    Owner.TriggerTransition(WizardFSMState.StateEnum.MOVING_TO_TARGET, nearestTarget, SimulationSettings.InvalidPosition);
+                    //change target
+                    Owner.TriggerTransition(WizardFSMState.StateEnum.MOVING_TO_TARGET, nearestTarget.entity, SimulationSettings.InvalidPosition);
                 }
+            }
+            else
+            {
+                //no entity found, go back to Idle
+                Owner.TriggerTransition(WizardFSMState.StateEnum.IDLE, EntityId.InvalidEntityId, SimulationSettings.InvalidPosition);
             }
         }
         
@@ -115,7 +95,7 @@ namespace Assets.Gamelogic.NPC.Wizard
             {
                 if (TargetIsEntity())
                 {
-                    StartMovingTowardsTargetEntity();
+                    StartMovingTowardsTarget();
                 }
                 else
                 {

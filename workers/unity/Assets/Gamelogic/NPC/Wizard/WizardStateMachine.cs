@@ -26,8 +26,12 @@ namespace Assets.Gamelogic.NPC.Wizard
         {
             npcWizard = inNpcWizard;
 
+            var entityFinder = WizardEntityFinderFactory.Build(behaviour.gameObject);
+            var targetInteractionStrategy = WizardInteractionStrategyFactory.Build(behaviour.gameObject);
+
             var idleState = new WizardIdleState(this, teamAssignment, cachedTeamHqCoordinates);
-            var moveToTargetState = WizardMoveToTargetStateFactory.Build(this, behaviour, targetNavigation, navigation);
+            var moveToPositionState = new WizardMoveToPositionState(this, behaviour, targetNavigation, navigation, entityFinder);
+            var moveToTargetState = new WizardMoveToTargetState(this, behaviour, targetNavigation, entityFinder, targetInteractionStrategy);
             var attackingState = new WizardAttackingState(this, behaviour, spellsBehaviour);
             var defendingState = new WizardDefendingState(this, behaviour, spellsBehaviour);
             var onFireState = new WizardOnFireState(this, navigation, targetNavigation);
@@ -35,6 +39,7 @@ namespace Assets.Gamelogic.NPC.Wizard
             var stateList = new Dictionary<WizardFSMState.StateEnum, IFsmState>()
             {
                 { WizardFSMState.StateEnum.IDLE, idleState },
+                { WizardFSMState.StateEnum.MOVING_TO_POSITION, moveToPositionState },
                 { WizardFSMState.StateEnum.MOVING_TO_TARGET, moveToTargetState },
                 { WizardFSMState.StateEnum.ATTACKING_TARGET, attackingState },
                 { WizardFSMState.StateEnum.DEFENDING_TARGET, defendingState },
@@ -48,9 +53,16 @@ namespace Assets.Gamelogic.NPC.Wizard
             allowedTransitions.Add(WizardFSMState.StateEnum.IDLE, new List<WizardFSMState.StateEnum>
                                    {
                                        WizardFSMState.StateEnum.IDLE,
-                                       WizardFSMState.StateEnum.MOVING_TO_TARGET,
+                                       WizardFSMState.StateEnum.MOVING_TO_POSITION,
                                        WizardFSMState.StateEnum.ON_FIRE
                                    });
+
+            allowedTransitions.Add(WizardFSMState.StateEnum.MOVING_TO_POSITION, new List<WizardFSMState.StateEnum>
+                                    {
+                                        WizardFSMState.StateEnum.IDLE,
+                                        WizardFSMState.StateEnum.MOVING_TO_TARGET,
+                                        WizardFSMState.StateEnum.ON_FIRE
+                                    });
 
             allowedTransitions.Add(WizardFSMState.StateEnum.MOVING_TO_TARGET, new List<WizardFSMState.StateEnum>
                                    {

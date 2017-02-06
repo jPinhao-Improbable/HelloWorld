@@ -62,6 +62,16 @@ namespace Assets.Gamelogic.NPC
             return closestTarget;
         }
 
+        public static float DistanceToTarget(GameObject referenceGameObject, EntityId targetId)
+        {
+            if (targetId == EntityId.InvalidEntityId)
+            {
+                return float.MaxValue;
+            }
+
+            return MathUtils.SqrDistance(referenceGameObject.transform.position, NPCUtils.GetTargetGameObject(targetId).transform.position);
+        }
+
         public static bool IsTargetAttackable(GameObject reference, GameObject target)
         {
             var teamAssignment = reference.GetComponent<TeamAssignmentVisualizerFSim>();
