@@ -11,7 +11,7 @@ using UnityEngine;
 namespace Assets.Gamelogic.Communication
 {
     [EngineType(EnginePlatform.FSim)]
-    public class ChatInterpreterbehaviour : MonoBehaviour
+    public class ChatInterpreterBehaviour : MonoBehaviour
     {
         [Require] private Chat.Writer chat;
 
@@ -22,6 +22,11 @@ namespace Assets.Gamelogic.Communication
             chat.CommandReceiver.OnReceiveChat += ParseChatMessage;
         }
 
+        void OnDisable()
+        {
+            chat.CommandReceiver.OnReceiveChat -= ParseChatMessage;
+        }
+
         private void ParseChatMessage(ResponseHandle<Chat.Commands.ReceiveChat, ChatMessage, Nothing> request)
         {
             var sender = request.Request.sender;
@@ -30,24 +35,21 @@ namespace Assets.Gamelogic.Communication
             if (senderEntity == null)
             {
                 Debug.LogError("Couldn't find sender info when parsing chat message");
+                request.Respond(new Nothing());
                 return;
             }
 
-            if (senderEntity.name != "Player" || !NPCUtils.IsInTeam(senderEntity, team.Data))
+            if (!senderEntity.CompareTag("Player") || !NPCUtils.IsInTeam(senderEntity, team.Data))
             {
                 //Don't want to parse message which aren't from a player or from the opposite team
+                Debug.LogWarning("Received a message from someone else: " + request.Request.message);
+                request.Respond(new Nothing());
                 return;
             }
 
             //Do somethign with this message
             Debug.LogWarning("Received a message from player: " + request.Request.message);
-
             request.Respond(new Nothing());
-        }
-
-        // Update is called once per frame
-        void Update () {
-		
         }
     }
 }
