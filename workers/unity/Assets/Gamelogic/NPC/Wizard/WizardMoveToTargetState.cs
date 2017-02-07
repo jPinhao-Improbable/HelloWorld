@@ -65,7 +65,6 @@ namespace Assets.Gamelogic.NPC.Wizard
             var newState = interactStrategy.TryInteract(targetGameObject);
             if (newState != WizardFSMState.StateEnum.MOVING_TO_TARGET)
             {
-                //TODO: will IDLE do funny things if targetEntityId != invalid?
                 Owner.TriggerTransition(newState, Owner.Data.targetEntityId, SimulationSettings.InvalidPosition);
             }
         }

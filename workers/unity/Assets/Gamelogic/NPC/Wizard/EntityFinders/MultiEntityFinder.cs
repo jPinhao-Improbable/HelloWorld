@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Assets.Gamelogic.NPC.Wizard.InteractionStrategies;
-using Improbable;
-using UnityEngine;
 
 namespace Assets.Gamelogic.NPC.Wizard.EntityFinders
 {
     class MultiEntityFinder : IEntityFinder
     {
         private readonly List<IEntityFinder> finders;
-        private readonly Transform transform;
 
-        public MultiEntityFinder(List<IEntityFinder> entityFinders, Transform ownerTransform)
+        public MultiEntityFinder(List<IEntityFinder> entityFinders)
         {
             finders = entityFinders;
-            transform = ownerTransform;
         }
 
         public FoundEntity FindEntity()

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using Assets.Gamelogic.NPC.Wizard.EntityFinders;
 using Assets.Gamelogic.NPC.Wizard.InteractionStrategies;
-using Improbable.Npc;
 using UnityEngine;
 
 namespace Assets.Gamelogic.NPC.Wizard.StateFactories
@@ -20,8 +16,7 @@ namespace Assets.Gamelogic.NPC.Wizard.StateFactories
             {
                 return
                     new MultiEntityFinder(
-                        new List<IEntityFinder> {attackBehaviour.EntityFinder, defendBehaviour.EntityFinder},
-                        owningEntity.transform);
+                        new List<IEntityFinder> {attackBehaviour.EntityFinder, defendBehaviour.EntityFinder});
             }
 
             if (attackBehaviour == null && defendBehaviour == null)
