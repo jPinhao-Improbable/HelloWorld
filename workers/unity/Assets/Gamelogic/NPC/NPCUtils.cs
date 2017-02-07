@@ -9,6 +9,7 @@ using Improbable.Building;
 using Improbable.Tree;
 using Improbable.Unity.Core;
 using System;
+using Improbable.Team;
 using UnityEngine;
 
 namespace Assets.Gamelogic.NPC
@@ -133,6 +134,17 @@ namespace Assets.Gamelogic.NPC
         {
             var targetPosition = currentPosition + (UnityEngine.Random.insideUnitSphere * maxDistance).FlattenVector();
             navigation.StartNavigation(targetPosition, interactionSqrDistance);
+        }
+
+        public static bool IsInTeam(GameObject target, TeamAssignmentData team)
+        {
+            var teamAssignment = target.GetComponent<TeamAssignmentVisualizerFSim>();
+            if (teamAssignment == null)
+            {
+                return false;
+            }
+
+            return teamAssignment.TeamId == team.teamId;
         }
     }
 }

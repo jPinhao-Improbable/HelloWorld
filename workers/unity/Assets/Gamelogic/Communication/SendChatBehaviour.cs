@@ -14,7 +14,7 @@ namespace Assets.Gamelogic.Communication
         
         public void SayChat(string message)
         {
-			SpatialOS.Commands.SendCommand(authCheck, Chat.Commands.SendChat.Descriptor, new ChatMessage(message), gameObject.EntityId(), response => {});
+			SpatialOS.Commands.SendCommand(authCheck, Chat.Commands.SendChat.Descriptor, new ChatMessage(message, gameObject.EntityId()), gameObject.EntityId(), response => {});
         }
     }
 }

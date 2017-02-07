@@ -21,7 +21,7 @@ namespace Assets.Gamelogic.Communication
         {
             var message = request.Request.message;
             var update = new Chat.Update();
-            update.AddChatSent(new ChatMessage(message.Substring(0, Mathf.Min(15, message.Length) )));
+            update.AddChatSent(new ChatMessage(message.Substring(0, Mathf.Min(15, message.Length) ), gameObject.EntityId()));
             chat.Send(update);
             request.Respond(new Nothing());
         }
