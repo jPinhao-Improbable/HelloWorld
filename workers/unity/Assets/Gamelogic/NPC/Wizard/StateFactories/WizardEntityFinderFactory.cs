@@ -16,7 +16,11 @@ namespace Assets.Gamelogic.NPC.Wizard.StateFactories
             {
                 return
                     new MultiEntityFinder(
-                        new List<IEntityFinder> {attackBehaviour.EntityFinder, defendBehaviour.EntityFinder});
+                        new List<WeightedItem<IEntityFinder>>
+                        {
+                            new WeightedItem<IEntityFinder>(attackBehaviour.EntityFinder, Random.value),
+                            new WeightedItem<IEntityFinder>(defendBehaviour.EntityFinder, Random.value)
+                        });
             }
 
             if (attackBehaviour == null && defendBehaviour == null)

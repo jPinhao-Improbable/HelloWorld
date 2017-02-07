@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Assets.Gamelogic.Utils;
-using Improbable;
-using Improbable.Npc;
+﻿using Improbable.Npc;
 using UnityEngine;
 
 namespace Assets.Gamelogic.NPC.Wizard.InteractionStrategies
