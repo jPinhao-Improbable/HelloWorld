@@ -20,6 +20,25 @@ namespace Assets.Gamelogic.Abilities
         private Collider[] spellTargets;
         private Coroutine reduceCooldownsCoroutine;
 
+        [SerializeField] private float MinSpellCooldown = SimulationSettings.SpellCooldownMin;
+        [SerializeField] private float MaxSpellCooldown = SimulationSettings.SpellCooldownMax;
+
+        private float _fullSpellCooldownField;
+        private float FullSpellCooldown
+        {
+            get { return _fullSpellCooldownField; }
+            set
+            {
+                _fullSpellCooldownField = value;
+                spells.Send(new Spells.Update().SetFullCooldown(_fullSpellCooldownField));
+            }
+        }
+
+        private void Start()
+        {
+            FullSpellCooldown = Random.Range(MinSpellCooldown, MaxSpellCooldown);
+        }
+
         private void OnEnable()
         {
             spellTargets = new Collider[SimulationSettings.MaxSpellTargets];
@@ -54,10 +73,11 @@ namespace Assets.Gamelogic.Abilities
             {
                 return;
             }
+
             var targetCount = FindSpellTargetEntities(position);
             ApplySpellEffectOnTargets(spellType, targetCount);
             spells.Send(new Spells.Update().AddSpellAnimationEvent(new SpellAnimationEvent(spellType, position.ToCoordinates())));
-            SetSpellCooldown(spellType, SimulationSettings.SpellCooldown);
+            SetSpellCooldown(spellType, FullSpellCooldown);
         }
 
         private int FindSpellTargetEntities(Vector3 position)

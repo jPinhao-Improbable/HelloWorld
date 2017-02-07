@@ -20,6 +20,7 @@ type SpellAnimationEvent {
 type SpellsData {
   map<SpellType, float> cooldowns = 1;
   bool can_cast_spells = 2;
+  float full_cooldown = 3;
 }
 
 component Spells {

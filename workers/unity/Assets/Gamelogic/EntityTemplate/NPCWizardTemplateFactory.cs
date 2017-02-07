@@ -27,8 +27,7 @@ namespace Assets.Gamelogic.EntityTemplate
             template.Add(new Health.Data(SimulationSettings.WizardMaxHealth, SimulationSettings.WizardMaxHealth, true));
             template.Add(new Flammable.Data(false, true, FireEffectType.SMALL));
             template.Add(new TargetNavigation.Data(NavigationState.INACTIVE, Vector3f.ZERO, EntityId.InvalidEntityId, 0f));
-            template.Add(new Spells.Data(new Map<SpellType, float> {{SpellType.LIGHTNING, 0f}, {SpellType.RAIN, 0f}},
-                true));
+            template.Add(new Spells.Data(new Map<SpellType, float> {{SpellType.LIGHTNING, 0f}, {SpellType.RAIN, 0f}}, true, SimulationSettings.SpellCooldownDefault));
             template.Add(new NPCWizard.Data(WizardFSMState.StateEnum.IDLE, EntityId.InvalidEntityId,
                 SimulationSettings.InvalidPosition.ToVector3f()));
             template.Add(new TeamAssignment.Data(teamId));

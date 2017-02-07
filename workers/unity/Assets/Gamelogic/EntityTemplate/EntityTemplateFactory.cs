@@ -31,7 +31,7 @@ namespace Assets.Gamelogic.EntityTemplate
             template.Add(new PlayerControls.Data(initialPosition));
             template.Add(new Health.Data(SimulationSettings.PlayerMaxHealth, SimulationSettings.PlayerMaxHealth, true));
             template.Add(new Flammable.Data(false, true, FireEffectType.SMALL));
-            template.Add(new Spells.Data(new Map<SpellType, float> { { SpellType.LIGHTNING, 0f }, { SpellType.RAIN, 0f } }, true));
+            template.Add(new Spells.Data(new Map<SpellType, float> { { SpellType.LIGHTNING, 0f }, { SpellType.RAIN, 0f } }, true, SimulationSettings.SpellCooldownDefault));
             template.Add(new Inventory.Data(0));
             template.Add(new Chat.Data());
             template.Add(new Heartbeat.Data(SimulationSettings.HeartbeatMax));

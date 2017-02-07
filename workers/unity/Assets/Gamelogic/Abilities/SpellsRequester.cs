@@ -31,6 +31,23 @@ namespace Assets.Gamelogic.Abilities
         [SerializeField] private PlayerAnimController playerAnimController;
         [SerializeField] private SpellcastAudioTriggers spellcastAudioTriggers;
 
+        private float _fullSpellCooldownField;
+        private float FullSpellCooldown
+        {
+            get { return _fullSpellCooldownField; }
+            set
+            {
+                if (value == _fullSpellCooldownField)
+                {
+                    return;
+                }
+
+                _fullSpellCooldownField = value;
+
+                CapCurrentCooldowns(_fullSpellCooldownField);
+            }
+        }
+
         private void Awake()
         {
             playerInputListener = gameObject.GetComponentIfUnassigned(playerInputListener);
@@ -41,11 +58,22 @@ namespace Assets.Gamelogic.Abilities
         private void OnEnable()
         {
             CreateSpellAOEIndicatorInstance();
+            FullSpellCooldown = spells.Data.fullCooldown;
+            spells.ComponentUpdated += OnSpellsUpdate;
         }
 
         private void OnDisable()
         {
             Destroy(spellAOEIndicatorInstance);
+            spells.ComponentUpdated -= OnSpellsUpdate;
+        }
+
+        private void OnSpellsUpdate(Spells.Update update)
+        {
+            if (update.fullCooldown.HasValue)
+            {
+                FullSpellCooldown = update.fullCooldown.Value;
+            }
         }
 
         private void CreateSpellAOEIndicatorInstance()
@@ -92,7 +120,7 @@ namespace Assets.Gamelogic.Abilities
         {
             var spellCastRequest = new SpellCastRequest(activeSpell, spellTargetPosition.ToCoordinates());
             SpatialOS.Commands.SendCommand(clientAuthorityCheck, Spells.Commands.SpellCastRequest.Descriptor, spellCastRequest, gameObject.EntityId(), response => { });
-            SetLocalSpellCooldown(activeSpell, SimulationSettings.SpellCooldown);
+            SetLocalSpellCooldown(activeSpell, FullSpellCooldown);
             DeactivateSpellCastingMode();
         }
 
@@ -124,6 +152,15 @@ namespace Assets.Gamelogic.Abilities
             }
         }
 
+        private void CapCurrentCooldowns(float newValue)
+        {
+            var enumerator = new List<SpellType>(spellCooldownsLocalCopy.Keys).GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                SetLocalSpellCooldown(enumerator.Current, Mathf.Min(spellCooldownsLocalCopy[enumerator.Current], newValue));
+            }
+        }
+
         private void SetLocalSpellCooldown(SpellType spellType, float value)
         {
             spellCooldownsLocalCopy[spellType] = value;
@@ -140,8 +177,8 @@ namespace Assets.Gamelogic.Abilities
 
         private void UpdateSpellsPanelCooldowns()
         {
-            SpellsPanelController.SetLightningIconFill(1f - spellCooldownsLocalCopy[SpellType.LIGHTNING] / SimulationSettings.SpellCooldown);
-            SpellsPanelController.SetRainIconFill(1f - spellCooldownsLocalCopy[SpellType.RAIN] / SimulationSettings.SpellCooldown);
+            SpellsPanelController.SetLightningIconFill(1f - spellCooldownsLocalCopy[SpellType.LIGHTNING] / FullSpellCooldown);
+            SpellsPanelController.SetRainIconFill(1f - spellCooldownsLocalCopy[SpellType.RAIN] / FullSpellCooldown);
         }
 
         public float GetLocalSpellCooldown(SpellType spellType)
