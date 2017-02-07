@@ -1,6 +1,8 @@
 using Assets.Gamelogic.Abilities;
+using Assets.Gamelogic.Communication;
 using Assets.Gamelogic.Core;
 using Assets.Gamelogic.Fire;
+using Assets.Gamelogic.FSM;
 using Assets.Gamelogic.Team;
 using Improbable;
 using Improbable.Abilities;
@@ -24,6 +26,7 @@ namespace Assets.Gamelogic.NPC.Wizard
         [SerializeField] private TeamAssignmentVisualizerFSim teamAssignment;
         [SerializeField] private TargetNavigationBehaviour navigation;
         [SerializeField] private List<Coordinates> cachedTeamHqCoordinates;
+        [SerializeField] private NpcSendChatBehaviour sendChat;
 
         private WizardStateMachine stateMachine;
 
@@ -39,11 +42,13 @@ namespace Assets.Gamelogic.NPC.Wizard
             cachedTeamHqCoordinates = new List<Coordinates>(SimulationSettings.TeamHQLocations);
             stateMachine = new WizardStateMachine(this, npcWizard, navigation, teamAssignment, targetNavigation, spellsBehaviour, cachedTeamHqCoordinates);
             stateMachine.OnEnable(npcWizard.Data.currentState);
+            stateMachine.StateChanged += OnStateChange;
         }
 
         private void OnDisable()
         {
             stateMachine.OnDisable();
+            stateMachine.StateChanged -= OnStateChange;
         }
 
         public void OnIgnite()
@@ -54,6 +59,33 @@ namespace Assets.Gamelogic.NPC.Wizard
         public void OnExtinguish()
         {
             stateMachine.TriggerTransition(WizardFSMState.StateEnum.IDLE, EntityId.InvalidEntityId, SimulationSettings.InvalidPosition);
+        }
+
+        private void OnStateChange(FiniteStateMachine<WizardFSMState.StateEnum> sender, FsmStateChangedArguments<WizardFSMState.StateEnum> args)
+        {
+            string chatMessage = string.Empty;
+            switch (args.NewState)
+            {
+                case WizardFSMState.StateEnum.IDLE :
+                    return;
+                case WizardFSMState.StateEnum.MOVING_TO_TARGET:
+                    chatMessage = "Changing target";
+                    break;
+                case WizardFSMState.StateEnum.ATTACKING_TARGET :
+                    chatMessage = "Burn maggot";
+                    break;
+                case WizardFSMState.StateEnum.DEFENDING_TARGET :
+                    chatMessage = "To the rescue";
+                    break;
+                case WizardFSMState.StateEnum.ON_FIRE :
+                    chatMessage = "Aaaaaaaaa";
+                    break;
+                default :
+                    Debug.LogError("Wizard changed to unknown state - " + args.NewState.ToString() + " - no chat to notify change");
+                    return;
+            }
+
+            sendChat.SayChat(chatMessage);
         }
     }
 }

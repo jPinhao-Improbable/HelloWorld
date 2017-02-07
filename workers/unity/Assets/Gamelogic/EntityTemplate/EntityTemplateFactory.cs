@@ -153,7 +153,8 @@ namespace Assets.Gamelogic.EntityTemplate
             template.Add(new Spells.Data(new Map<SpellType, float> { { SpellType.LIGHTNING, 0f }, { SpellType.RAIN, 0f } }, true));
             template.Add(new NPCWizard.Data(WizardFSMState.StateEnum.IDLE, EntityId.InvalidEntityId, SimulationSettings.InvalidPosition.ToVector3f()));
             template.Add(new TeamAssignment.Data(teamId));
-            
+            template.Add(new Chat.Data());
+
             var permissions = Acl.Build()
                 .SetReadAccess(CommonPredicates.PhysicsOrVisual)
                 .SetWriteAccess<TransformComponent>(CommonPredicates.PhysicsOnly)
@@ -163,7 +164,8 @@ namespace Assets.Gamelogic.EntityTemplate
                 .SetWriteAccess<TargetNavigation>(CommonPredicates.PhysicsOnly)
                 .SetWriteAccess<Spells>(CommonPredicates.PhysicsOnly)
                 .SetWriteAccess<NPCWizard>(CommonPredicates.PhysicsOnly)
-				.SetWriteAccess<TeamAssignment>(CommonPredicates.PhysicsOnly);
+                .SetWriteAccess<TeamAssignment>(CommonPredicates.PhysicsOnly)
+                .SetWriteAccess<Chat>(CommonPredicates.PhysicsOnly);
 
             template.SetAcl(permissions);
 
