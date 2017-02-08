@@ -27,6 +27,7 @@ namespace Assets.Gamelogic.NPC.Wizard
         [SerializeField] private TargetNavigationBehaviour navigation;
         [SerializeField] private List<Coordinates> cachedTeamHqCoordinates;
         [SerializeField] private NpcSendChatBehaviour sendChat;
+        [SerializeField] private WizardChatInterpreterBehaviour chatInterpreter;
 
         private WizardStateMachine stateMachine;
 
@@ -43,12 +44,16 @@ namespace Assets.Gamelogic.NPC.Wizard
             stateMachine = new WizardStateMachine(this, npcWizard, navigation, teamAssignment, targetNavigation, spellsBehaviour, cachedTeamHqCoordinates);
             stateMachine.OnEnable(npcWizard.Data.currentState);
             stateMachine.StateChanged += OnStateChange;
+
+            chatInterpreter.ChangeStateCommand += OnChangeStateCommand;
         }
 
         private void OnDisable()
         {
             stateMachine.OnDisable();
             stateMachine.StateChanged -= OnStateChange;
+
+            chatInterpreter.ChangeStateCommand -= OnChangeStateCommand;
         }
 
         public void OnIgnite()
@@ -86,6 +91,11 @@ namespace Assets.Gamelogic.NPC.Wizard
             }
 
             sendChat.SayChat(chatMessage);
+        }
+
+        private void OnChangeStateCommand(StateChangeData<WizardFSMState.StateEnum> newState)
+        {
+            stateMachine.TriggerTransition(newState.NewState, newState.TargetEntity, newState.TargetPosition);
         }
     }
 }

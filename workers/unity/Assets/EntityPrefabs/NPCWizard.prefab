@@ -439,6 +439,7 @@ GameObject:
   - component: {fileID: 114027089586836474}
   - component: {fileID: 114249388416433658}
   - component: {fileID: 114162765939895162}
+  - component: {fileID: 114957709648206628}
   m_Layer: 0
   m_Name: NPCWizard
   m_TagString: Untagged
@@ -1714,6 +1715,7 @@ MonoBehaviour:
   teamAssignment: {fileID: 114000010926097938}
   navigation: {fileID: 114000012395693278}
   sendChat: {fileID: 114142828186621504}
+  chatInterpreter: {fileID: 114957709648206628}
 --- !u!114 &114000013429835486
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1910,6 +1912,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9fbbd51744b94e43be5b7681c56589e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114957709648206628
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000012946937004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63ea76e2dda4fdc47b16a2dc9204ca70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chatReceiver: {fileID: 114162765939895162}
 --- !u!136 &136000012983362050
 CapsuleCollider:
   m_ObjectHideFlags: 1
