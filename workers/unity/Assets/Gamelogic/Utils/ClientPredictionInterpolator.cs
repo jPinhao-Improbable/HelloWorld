@@ -19,6 +19,9 @@ namespace Assets.Gamelogic.Utils
         private float FullUpdateLength;
         private float LastUpdate;
 
+        //100ms buffer to update length
+        private const float LatencyBuffer = 0.1f;
+
         public ClientPredictionInterpolator(TimedUpdate<TType> startValue, Func<TType, TType, float, TType> interpolateFunction)
         {
             Interpolate = interpolateFunction;
@@ -32,7 +35,7 @@ namespace Assets.Gamelogic.Utils
 
         public void Update(TimedUpdate<TType> newTarget)
         {
-            FullUpdateLength = newTarget.timeStamp - target.timeStamp;
+            FullUpdateLength = newTarget.timeStamp - target.timeStamp + LatencyBuffer;
             LastUpdate = Time.fixedTime;
 
             current = target;
