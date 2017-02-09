@@ -17,7 +17,10 @@ namespace Assets.Gamelogic.Core
         public void TriggerTeleport(Vector3 position)
         {
             transform.position = position;
-            transformComponent.Send(new TransformComponent.Update().SetPosition(position.ToCoordinates()).AddTeleportEvent(new TeleportEvent(position.ToCoordinates())));
+            transformComponent.Send(new TransformComponent.Update()
+                                            .SetPosition(position.ToCoordinates())
+                                            .SetTimeStamp(Time.fixedTime)
+                                            .AddTeleportEvent(new TeleportEvent(position.ToCoordinates())));
         }
 
         private void OnEnable()
@@ -33,7 +36,10 @@ namespace Assets.Gamelogic.Core
             if ((PositionNeedsUpdate(newPosition) || RotationNeedsUpdate(newRotation)) && fixedFramesSinceLastUpdate > SimulationSettings.TransformUpdatesToSkipBetweenSends)
             {
                 fixedFramesSinceLastUpdate = 0;
-                transformComponent.Send(new TransformComponent.Update().SetPosition(newPosition).SetRotation(newRotation));
+                transformComponent.Send(new TransformComponent.Update()
+                                                .SetPosition(newPosition)
+                                                .SetRotation(newRotation)
+                                                .SetTimeStamp(Time.fixedTime));
             }
         }
 

@@ -8,5 +8,6 @@ component TransformComponent {
   id = 1002;
   EntityPosition position = 1;
   uint32 rotation = 2;
+  float time_stamp = 3;
   event TeleportEvent teleport_event;
 }

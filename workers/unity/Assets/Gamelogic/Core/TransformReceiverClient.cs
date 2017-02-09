@@ -15,6 +15,9 @@ namespace Assets.Gamelogic.Core
 
         [SerializeField] private Rigidbody myRigidbody;
 
+        private ClientPredictionInterpolator<Vector3> movementInterpolator;
+        private ClientPredictionInterpolator<float> rotationInterpolator;
+
         private void Awake()
         {
             myRigidbody = gameObject.GetComponent<Rigidbody>();
@@ -26,6 +29,9 @@ namespace Assets.Gamelogic.Core
             if (IsNotAnAuthoritativePlayer())
             {
                 SetUpRemoteTransform();
+
+                movementInterpolator = new ClientPredictionInterpolator<Vector3>(new TimedUpdate<Vector3> {Value = transformComponent.Data.position.ToVector3(), timeStamp = transformComponent.Data.timeStamp }, Vector3.Lerp );
+                rotationInterpolator = new ClientPredictionInterpolator<float>(new TimedUpdate<float> { Value = (float)transformComponent.Data.rotation, timeStamp = transformComponent.Data.timeStamp }, Mathf.Lerp);
             }     
         }
 
@@ -44,25 +50,40 @@ namespace Assets.Gamelogic.Core
             {
                 TeleportTo(update.teleportEvent[i].targetPosition.ToVector3());
             }
+
+            if(IsNotAnAuthoritativePlayer())
+            {
+                if (update.position.HasValue && update.timeStamp.HasValue)
+                {
+                    movementInterpolator.Update(new TimedUpdate<Vector3> { Value = update.position.Value.ToVector3(), timeStamp = update.timeStamp.Value });
+                }
+                if (update.rotation.HasValue && update.timeStamp.HasValue)
+                {
+                    rotationInterpolator.Update(new TimedUpdate<float> { Value = update.rotation.Value, timeStamp = update.timeStamp.Value });
+                }
+            }
         }
 
         private void TeleportTo(Vector3 position)
         {
             myRigidbody.velocity = Vector3.zero;
             myRigidbody.MovePosition(position);
+
+            movementInterpolator = new ClientPredictionInterpolator<Vector3>(new TimedUpdate<Vector3> { Value = transformComponent.Data.position.ToVector3(), timeStamp = transformComponent.Data.timeStamp }, Vector3.Lerp);
+            rotationInterpolator = new ClientPredictionInterpolator<float>(new TimedUpdate<float> { Value = (float)transformComponent.Data.rotation, timeStamp = transformComponent.Data.timeStamp }, Mathf.LerpAngle);
         }
 
         private bool IsNotAnAuthoritativePlayer()
         {
             return !gameObject.HasAuthority(ClientAuthorityCheck.ComponentId);
         }
-
-        private void Update()
+        
+        private void FixedUpdate()
         {
             if (IsNotAnAuthoritativePlayer())
             {
-                myRigidbody.MovePosition(Vector3.Lerp(myRigidbody.position, transformComponent.Data.position.ToVector3(), 0.2f));
-                myRigidbody.MoveRotation(Quaternion.Euler(0f, QuantizationUtils.DequantizeAngle(transformComponent.Data.rotation), 0f));
+                myRigidbody.MovePosition(movementInterpolator.NextPosition());
+                myRigidbody.MoveRotation(Quaternion.Euler(0f, QuantizationUtils.DequantizeAngle((uint)rotationInterpolator.NextPosition()), 0f));
             }
             else if(isRemote)
             {

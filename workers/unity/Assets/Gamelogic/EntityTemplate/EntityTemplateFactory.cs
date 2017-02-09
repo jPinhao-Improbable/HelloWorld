@@ -16,6 +16,7 @@ using Improbable.Team;
 using Improbable.Tree;
 using Improbable.Unity.Core.Acls;
 using Improbable.Worker;
+using UnityEngine;
 
 namespace Assets.Gamelogic.EntityTemplate
 {
@@ -26,7 +27,7 @@ namespace Assets.Gamelogic.EntityTemplate
             var template = new Entity();
             template.Add(new ClientAuthorityCheck.Data());
             template.Add(new FSimAuthorityCheck.Data());
-            template.Add(new TransformComponent.Data(initialPosition, 0));
+            template.Add(new TransformComponent.Data(initialPosition, 0, Time.fixedTime));
             template.Add(new PlayerInfo.Data(true, initialPosition));
             template.Add(new PlayerControls.Data(initialPosition));
             template.Add(new Health.Data(SimulationSettings.PlayerMaxHealth, SimulationSettings.PlayerMaxHealth, true));
@@ -64,7 +65,7 @@ namespace Assets.Gamelogic.EntityTemplate
         {
             var template = new SnapshotEntity { Prefab = SimulationSettings.BarracksPrefabName };
             template.Add(new FSimAuthorityCheck.Data());
-            template.Add(new TransformComponent.Data(initialPosition, (uint)(UnityEngine.Random.value * 360)));
+            template.Add(new TransformComponent.Data(initialPosition, (uint)(UnityEngine.Random.value * 360), Time.fixedTime));
             template.Add(new BarracksInfo.Data(barracksState));
             template.Add(new Health.Data(barracksState == BarracksState.CONSTRUCTION_FINISHED ? SimulationSettings.BarracksMaxHealth : 0, SimulationSettings.BarracksMaxHealth, true));
             template.Add(new Flammable.Data(false, false, FireEffectType.BIG));
@@ -94,7 +95,7 @@ namespace Assets.Gamelogic.EntityTemplate
         {
             var template = new SnapshotEntity { Prefab = SimulationSettings.TreePrefabName };
             template.Add(new FSimAuthorityCheck.Data());
-            template.Add(new TransformComponent.Data(initialPosition, initialRotation));
+            template.Add(new TransformComponent.Data(initialPosition, initialRotation, Time.fixedTime));
             template.Add(new Harvestable.Data());
             template.Add(new Health.Data(SimulationSettings.TreeMaxHealth, SimulationSettings.TreeMaxHealth, true));
             template.Add(new Flammable.Data(false, true, FireEffectType.BIG));
@@ -117,7 +118,7 @@ namespace Assets.Gamelogic.EntityTemplate
         public static SnapshotEntity CreateNPCLumberjackTemplate(Coordinates initialPosition, uint teamId)
         {
             var template = new SnapshotEntity { Prefab = SimulationSettings.NPCPrefabName };
-            template.Add(new TransformComponent.Data(initialPosition, 0));
+            template.Add(new TransformComponent.Data(initialPosition, 0, Time.fixedTime));
             template.Add(new FSimAuthorityCheck.Data());
             template.Add(new Health.Data(SimulationSettings.LumberjackMaxHealth, SimulationSettings.LumberjackMaxHealth, true));
             template.Add(new Flammable.Data(false, true, FireEffectType.SMALL));
@@ -145,7 +146,7 @@ namespace Assets.Gamelogic.EntityTemplate
         public static SnapshotEntity CreateNPCWizardTemplate(Coordinates initialPosition, uint teamId)
         {
             var template = new SnapshotEntity { Prefab = SimulationSettings.NPCWizardPrefabName };
-            template.Add(new TransformComponent.Data(initialPosition, 0));
+            template.Add(new TransformComponent.Data(initialPosition, 0, Time.fixedTime));
             template.Add(new FSimAuthorityCheck.Data());
             template.Add(new Health.Data(SimulationSettings.WizardMaxHealth, SimulationSettings.WizardMaxHealth, true));
             template.Add(new Flammable.Data(false, true, FireEffectType.SMALL));
@@ -175,7 +176,7 @@ namespace Assets.Gamelogic.EntityTemplate
             var template = new SnapshotEntity { Prefab = SimulationSettings.HQPrefabName };
             template.Add(new FSimAuthorityCheck.Data());
             template.Add(new HQInfo.Data(new List<EntityId>()));
-            template.Add(new TransformComponent.Data(initialPosition, initialRotation));
+            template.Add(new TransformComponent.Data(initialPosition, initialRotation, Time.fixedTime));
             template.Add(new Health.Data(SimulationSettings.HQMaxHealth, SimulationSettings.HQMaxHealth, true));
             template.Add(new TeamAssignment.Data(teamId));
             template.Add(new Flammable.Data(false, true, FireEffectType.BIG));
@@ -197,7 +198,7 @@ namespace Assets.Gamelogic.EntityTemplate
         public static SnapshotEntity CreateSimulationManagerTemplate()
         {
             var template = new SnapshotEntity { Prefab = SimulationSettings.SimulationManagerEntityName };
-            template.Add(new TransformComponent.Data(Coordinates.ZERO, 0));
+            template.Add(new TransformComponent.Data(Coordinates.ZERO, 0, Time.fixedTime));
             template.Add(new FSimAuthorityCheck.Data());
             template.Add(new PlayerLifeCycle.Data(new Map<string, EntityId>()));
 
